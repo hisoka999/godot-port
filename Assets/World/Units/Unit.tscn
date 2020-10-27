@@ -24,7 +24,6 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 768, 384 )
 
 [node name="Area" type="Area" parent="."]
-visible = false
 
 [node name="CollisionShape" type="CollisionShape" parent="Area"]
 shape = SubResource( 1 )
@@ -33,7 +32,6 @@ shape = SubResource( 1 )
 transform = Transform( 1, 0, 0, 0, 0.999999, 0, 0, 0, 1, 0, 0, 0 )
 
 [node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
-visible = false
 shape = SubResource( 2 )
 [connection signal="input_event" from="Area" to="." method="_on_Area_input_event"]
 [connection signal="mouse_entered" from="Area" to="." method="_on_Area_mouse_entered"]

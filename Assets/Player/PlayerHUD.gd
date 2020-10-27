@@ -26,7 +26,3 @@ func raise_notification(message_type: int, message_text: String) -> void:
 		messages.add_child(message)
 #	else:
 #		queued_messages.append()
-
-func _gui_input(event: InputEvent) -> void:
-	if not event is InputEventMouseMotion:
-		print_debug("PlayerHUD: %s" % event.as_text())
