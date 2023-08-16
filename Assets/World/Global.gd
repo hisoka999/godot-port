@@ -120,7 +120,7 @@ enum Faction {
 	PURPLE,
 	CYAN,
 	YELLOW,
-	PINK,
+	MAGENTA,
 	TEAL,
 	LIME_GREEN,
 	BORDEAUX,
@@ -268,74 +268,25 @@ const FACTION_FLAGS = [
 	preload("res://Assets/UI/Images/TabWidget/Emblems/emblem_black.png"),
 ]
 
-const COLOR = [
-	Color(0,       0,    0, 0), # Transparent black.
-	Color(1,    0.04, 0.04, 1), # Red.
-	Color(0,    0.28, 0.71, 1), # Sea Blue.
-	Color(0,    0.63, 0.09, 1), # Dark Green.
-	Color(0.88,  0.4,    0, 1), # Orange.
-	Color(0.50,    0, 0.50, 1), # Purple.
-	Color(0,       1,    1, 1), # Cyan.
-	Color(1,    0.84,    0, 1), # Yellow.
-	Color(1,       0,    1, 1), # Magenta.
-	Color(0,    0.57, 0.55, 1), # Teal.
-	Color(0,       1,    0, 1), # Lime Green.
-	Color(0.59, 0.02, 0.16, 1), # Carmine Red.
-	Color(1,       1,    1, 1), # White.
-	Color(0.50, 0.50, 0.50, 1), # Gray.
-	Color(0,       0,    0, 1), # Black.
-];
-
-const FACTION_COLOR_NONE =\
-	preload("res://Assets/Player/FactionColor/FactionColorNone.tres")
-const FACTION_COLOR_RED =\
-	preload("res://Assets/Player/FactionColor/FactionColorRed.tres")
-const FACTION_COLOR_BLUE =\
-	preload("res://Assets/Player/FactionColor/FactionColorBlue.tres")
-const FACTION_COLOR_DARK_GREEN =\
-	preload("res://Assets/Player/FactionColor/FactionColorDarkGreen.tres")
-const FACTION_COLOR_ORANGE =\
-	preload("res://Assets/Player/FactionColor/FactionColorOrange.tres")
-const FACTION_COLOR_PURPLE =\
-	preload("res://Assets/Player/FactionColor/FactionColorPurple.tres")
-const FACTION_COLOR_CYAN =\
-	preload("res://Assets/Player/FactionColor/FactionColorCyan.tres")
-const FACTION_COLOR_YELLOW =\
-	preload("res://Assets/Player/FactionColor/FactionColorYellow.tres")
-const FACTION_COLOR_PINK =\
-	preload("res://Assets/Player/FactionColor/FactionColorPink.tres")
-const FACTION_COLOR_TEAL =\
-	preload("res://Assets/Player/FactionColor/FactionColorTeal.tres")
-const FACTION_COLOR_LIME_GREEN =\
-	preload("res://Assets/Player/FactionColor/FactionColorLimeGreen.tres")
-const FACTION_COLOR_BORDEAUX =\
-	preload("res://Assets/Player/FactionColor/FactionColorBordeaux.tres")
-const FACTION_COLOR_WHITE =\
-	preload("res://Assets/Player/FactionColor/FactionColorWhite.tres")
-const FACTION_COLOR_GRAY =\
-	preload("res://Assets/Player/FactionColor/FactionColorGray.tres")
-const FACTION_COLOR_BLACK =\
-	preload("res://Assets/Player/FactionColor/FactionColorBlack.tres")
-
-const COLOR_MATERIAL = [
-	FACTION_COLOR_NONE,
-	FACTION_COLOR_RED,
-	FACTION_COLOR_BLUE,
-	FACTION_COLOR_DARK_GREEN,
-	FACTION_COLOR_ORANGE,
-	FACTION_COLOR_PURPLE,
-	FACTION_COLOR_CYAN,
-	FACTION_COLOR_YELLOW,
-	FACTION_COLOR_PINK,
-	FACTION_COLOR_TEAL,
-	FACTION_COLOR_LIME_GREEN,
-	FACTION_COLOR_BORDEAUX,
-	FACTION_COLOR_WHITE,
-	FACTION_COLOR_GRAY,
-	FACTION_COLOR_BLACK,
+const FACTION_COLORS = [
+	Color8(  0,   0,   0,   0), # None (transparent black).
+	Color8(250,  10,  10, 255), # Red.
+	Color8(  0,  71, 181, 255), # Sea Blue.
+	Color8(  0, 158,  23, 255), # Dark Green.
+	Color8(224, 102,   0, 255), # Orange.
+	Color8(128,   0, 128, 255), # Purple.
+	Color8(  0, 255, 255, 255), # Cyan.
+	Color8(255, 214,   0, 255), # Yellow.
+	Color8(255,   0, 255, 255), # Magenta.
+	Color8(  0, 145, 140, 255), # Teal.
+	Color8(  0, 255,   0, 255), # Lime Green.
+	Color8(150,   5,  41, 255), # Bordeaux Red.
+	Color8(255, 255, 255, 255), # White.
+	Color8(128, 128, 128, 255), # Gray.
+	Color8(  0,   0,   0, 255), # Black.
 ]
 
-const MESSAGE_SCENE = preload("res://Assets/UI/Scenes/Message.tscn")
+const MESSAGE_SCENE = preload("res://Assets/UI/Notification/Message.tscn")
 
 #const WINDOW_MODES = [
 #	WindowMode.WINDOWED,
@@ -366,8 +317,6 @@ const LANGUAGES_READABLE = {
 	"fr": "Français",
 }
 
-#warning-ignore-all:unused_class_variable
-
 # Game variables
 var game_type := "FreePlay"
 var faction := 1
@@ -377,10 +326,11 @@ var resource_density := 1.0
 var has_traders := false
 var has_pirates := true
 var has_disasters := false
-# -------
-var Game: Spatial = null
-var PlayerStart: Spatial = null
 
+var Game: Node3D = null
+var PlayerStart: Node3D = null
+
+@warning_ignore("unused_private_class_variable")
 var _warning := false # DEBUG
 
 func _ready() -> void:
@@ -389,19 +339,19 @@ func _ready() -> void:
 	var window_mode = Config.window_mode
 	var screen_resolution = Config.screen_resolution
 
-	OS.window_fullscreen = window_mode
+	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (window_mode) else Window.MODE_WINDOWED
 	set_screen_resolution(screen_resolution)
 
 	set_audio_volumes()
 
-	pause_mode = Node.PAUSE_MODE_PROCESS
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func set_screen_resolution(screen_resolution: String) -> void:
 	var resolution = screen_resolution.split("x")
 	resolution = Vector2(int(resolution[0]), int(resolution[1]))
-	OS.set_window_size(resolution)
-	OS.center_window()
-	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+	get_window().set_size(resolution)
+	#OS.center_window()
+	#Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 
 func set_audio_volumes() -> void:
 	Audio.set_master_volume(Config.master_volume)
@@ -438,12 +388,12 @@ func _input(event: InputEvent) -> void:
 
 		window_mode = (window_mode + 1) % WINDOW_MODES.size()
 		prints("window_mode:", window_mode)
-		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-		OS.window_fullscreen = !OS.window_fullscreen
+		#Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (!((get_window().mode == Window.MODE_EXCLUSIVE_FULLSCREEN) or (get_window().mode == Window.MODE_FULLSCREEN))) else Window.MODE_WINDOWED
 
 		Config.window_mode = window_mode
 
-		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+		#Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 
 	if event.is_action_pressed("quit_game"):
 		get_tree().quit()

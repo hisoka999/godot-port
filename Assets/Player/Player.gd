@@ -6,9 +6,7 @@ var faction = Global.Faction.NONE
 var settlements = []
 var ships = []
 
-var camera
-
-#warning-ignore-all:unused_class_variable
+var camera: PlayerCamera
 
 func _ready() -> void:
 	print_debug(
@@ -16,7 +14,7 @@ func _ready() -> void:
 				[Config.player_name, faction, Global.FACTIONS[faction]])
 		)
 
-func _on_Game_notification(message_type, message_text) -> void:
+func _on_Game_notification(message_type: int, message_text: String) -> void:
 	if camera != null:
 		var hud := camera.get_node("PlayerHUD") as PlayerHUD
 		hud.raise_notification(message_type, message_text)
